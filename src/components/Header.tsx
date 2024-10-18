@@ -16,7 +16,7 @@ export default function Header() {
         }
     },[status, session])
     return (
-        <div className='fixed top-0 w-full h-[60px] bg-black border-b border-white/60 p-3 flex justify-between items-center z-50'>
+        <div className='fixed top-0 w-full max-w-screen-xl mx-auto h-[60px] bg-black border-b border-white/60 p-3 flex justify-between items-center z-50'>
             <Link href='/'>
                 <h2 className='ml-7 font-bold text-xl'> PixelMind </h2>
             </Link>
