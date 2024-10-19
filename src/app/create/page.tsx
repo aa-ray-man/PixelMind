@@ -1,6 +1,6 @@
 "use client"
 import { Button } from '@/components/ui/button';
-import React from 'react'
+import React, { useState } from 'react'
 import { z } from "zod"
 import {
   Form,
@@ -12,6 +12,9 @@ import {
 import { useForm } from 'react-hook-form';
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Input } from '@/components/ui/input';
+import Image from 'next/image';
+import { POST } from '../api/image/route';
+import { useToast } from '@/hooks/use-toast';
 
 const formSchema = z.object({
   prompt: z
@@ -22,6 +25,11 @@ const formSchema = z.object({
 
 export default function page() {
 
+  const [outputImg, setOutputImg] = useState<string | null>(null);
+  const [loading, setLoading] = useState<boolean>(false);
+
+  const {toast} = useToast()
+
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -29,8 +37,26 @@ export default function page() {
     },
   });
 
-  function onSubmit(values: z.infer<typeof formSchema>) {
-    console.log(values)
+  async function onSubmit(values: z.infer<typeof formSchema>) {
+    try {
+      setLoading(true);
+      const response = await fetch("/api/image", {
+        method: "POST",
+        body: JSON.stringify(values)
+      });
+      const data = await response.json();  //Extract the body from response
+      if(response.status === 200){
+        setOutputImg(data.url);
+      }else{
+        console.log(data.error)
+        toast({variant:"destructive", description:data.error})
+      }
+    } catch (error) {
+        console.error(error);
+    }finally{
+      setLoading(false);
+    }
+    
   }
 
   return (
@@ -38,7 +64,7 @@ export default function page() {
       <div className="w-full p-3">
         <h1 className="text-center font-bold text-white text-4xl">Create</h1>
         <p className="text-white/60 text-center">
-          Generate Stunning Images from Text for FREE
+          And click profile pic to check your creations
         </p>
       </div>
       <div className="flex w-full gap-3 h-[calc(100dvh-200px)] md:flex-row flex-col">
@@ -69,7 +95,7 @@ export default function page() {
                     </FormItem>
                   )}
                 />
-                <Button type="submit">
+                <Button loading={loading} type="submit">
                   Generate
                 </Button>
               </form>
@@ -77,8 +103,12 @@ export default function page() {
           </div>
         </div>
 
-        <div className='__output flex-[1] bg-white/5 rounded-lg '></div>
-
+        <div className='__output flex-[1] bg-white/5 rounded-lg relative overflow-hidden'>
+          {outputImg ? 
+          (<Image alt="output" className='w-full h-full object-contain' src={outputImg} width={300} height={300} />)
+          :<div className='w-full h-full flex justify-center items-center text-white/60 text-center p-3'>
+          Enter your prompt and hit Generate!</div>}
+        </div>
       </div>
     </div>
   );
