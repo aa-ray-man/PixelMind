@@ -3,6 +3,8 @@ import { prisma } from "@/utils/prisma";
 import { getServerSession } from "next-auth";
 import { NextRequest, NextResponse } from "next/server";
 
+export const maxDuration = 10;
+
 export async function POST(request: NextRequest) {
     const session = await getServerSession(authOptions);
     if (!session) {
@@ -28,7 +30,13 @@ export async function POST(request: NextRequest) {
 
     const imageURL = `https://image.pollinations.ai/prompt/${encodeURIComponent(prompt)}?seed=${randomSeed}&width=512&height=512&nologo=True`
 
-    await fetch(imageURL)
+    try {
+      await fetch(imageURL, { signal: AbortSignal.timeout(80000) });
+    } catch(e) {
+      return NextResponse.json({
+        error: "Error while generating the image"
+      }, {status: 500});
+    }
 
     await prisma.post.create({
         data: {

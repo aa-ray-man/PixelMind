@@ -17,6 +17,7 @@ import { z } from "zod";
 import Image from "next/image";
 import { useToast } from "@/hooks/use-toast";
 
+
 const formSchema = z.object({
   prompt: z
     .string()
