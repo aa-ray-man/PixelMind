@@ -62,7 +62,7 @@ export default function Page() {
       <div className="w-full p-3">
         <h1 className="text-center font-bold text-white text-4xl">Create</h1>
         <p className="text-white/60 text-center">
-          Generate Stunning Images from Text for FREE
+          And check your creations by clicking profile pic!
         </p>
       </div>
       <div className="flex w-full gap-3 h-[calc(100dvh-200px)] md:flex-row flex-col">
